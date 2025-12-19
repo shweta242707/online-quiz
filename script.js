@@ -5,13 +5,28 @@ const quiz = [
         answer: 1
     },
     {
-        question: "Which language runs in browser?",
-        options: ["C", "Java", "Python", "JavaScript"],
+        question: "Which language runs in a browser?",
+        options: ["Java", "C", "Python", "JavaScript"],
         answer: 3
     },
     {
         question: "HTML is used for?",
-        options: ["Design", "Structure", "Logic", "Database"],
+        options: ["Styling", "Structure", "Logic", "Database"],
+        answer: 1
+    },
+    {
+        question: "CSS stands for?",
+        options: [
+            "Creative Style Sheets",
+            "Cascading Style Sheets",
+            "Computer Style Sheets",
+            "Colorful Style Sheets"
+        ],
+        answer: 1
+    },
+    {
+        question: "Which is NOT a programming language?",
+        options: ["Python", "HTML", "Java", "C++"],
         answer: 1
     }
 ];
@@ -19,11 +34,13 @@ const quiz = [
 let index = 0;
 let score = 0;
 let user = "";
+let timeLeft = 10;
+let timer;
 
 function startQuiz() {
     user = document.getElementById("username").value;
     if (user === "") {
-        alert("Enter your name");
+        alert("Please enter your name");
         return;
     }
     document.getElementById("startScreen").classList.add("hidden");
@@ -32,10 +49,29 @@ function startQuiz() {
 }
 
 function loadQuestion() {
+    timeLeft = 10;
+    document.getElementById("timer").innerText = "Time left: 10s";
+    startTimer();
+
     document.getElementById("question").innerText = quiz[index].question;
-    document.querySelectorAll(".option").forEach((btn, i) => {
+    const options = document.querySelectorAll(".option");
+    options.forEach((btn, i) => {
         btn.innerText = quiz[index].options[i];
     });
+}
+
+function startTimer() {
+    clearInterval(timer);
+    timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer").innerText =
+            "Time left: " + timeLeft + "s";
+
+        if (timeLeft === 0) {
+            clearInterval(timer);
+            nextQuestion();
+        }
+    }, 1000);
 }
 
 function checkAnswer(selected) {
@@ -45,14 +81,16 @@ function checkAnswer(selected) {
 }
 
 function nextQuestion() {
+    clearInterval(timer);
     index++;
+
     if (index < quiz.length) {
         loadQuestion();
     } else {
         document.getElementById("quizScreen").classList.add("hidden");
         document.getElementById("resultScreen").classList.remove("hidden");
         document.getElementById("resultScreen").innerHTML =
-            `<h2>Thank you ${user}</h2>
+            `<h2>Well done, ${user}!</h2>
              <p>Your Score: ${score}/${quiz.length}</p>
              <button onclick="location.reload()">Play Again</button>`;
     }
